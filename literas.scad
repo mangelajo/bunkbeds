@@ -7,8 +7,11 @@
 // parámetros de los materiales:
 
 ancho_viga = 12;
-fondo_viga = 6;
-grosor_tabla = 2.5;
+fondo_viga = 4;
+
+ancho_liston = 6;
+fondo_liston = 4;
+grosor_tabla = 1.9;
 
 
 // parámetros de la cama:
@@ -42,6 +45,14 @@ module viga(len, invert=false) {
      if (output_materials) echo("viga longitud: ", len);
 }
 
+module liston(len, invert=false) {
+     if (invert) {
+        color("BurlyWood") cube([fondo_liston,ancho_liston,len]);
+     } else {
+        color("BurlyWood") cube([ancho_liston,fondo_liston,len]);
+     }
+     if (output_materials) echo("liston longitud: ", len);
+}
 
 module tabla(ancho, alto) {
     color("SaddleBrown") cube([grosor_tabla, ancho, alto]);
@@ -69,9 +80,17 @@ module cama() {
     translate([ancho_viga, grosor_tabla, alto_litera + alto_colchon+20]) rotate([0, 0, -90 ]) tabla(largo_colchon-ancho_viga*2, 40);
 
     // refuerzos estructurales
-    for(j=[0:1]) for(i=[0:1])
-       translate([(largo_colchon-fondo_viga)*j, fondo_viga, 70+40*i]) 
-        rotate([-90, -90, 0]) viga(fondo_colchon);
+    for(j=[0:1]) {
+        for(i=[0:1]) {
+            
+            translate([(largo_colchon-fondo_viga)*j, fondo_viga, 70+40*i]) 
+                rotate([-90, -90, 0]) viga(fondo_colchon);
+        }
+        // refuerzo inferior estructural
+        translate([(largo_colchon-fondo_viga)*j, fondo_viga, 14]) 
+                rotate([-90, -90, 0]) viga(fondo_colchon);
+    }
+    
 
     // camas 
     for (i=[0:1]) {
@@ -148,7 +167,7 @@ module peldanos() {
         translate([0,_largo_peldano*i,grosor_tabla + alto_peldano*i]) tabla(largo_escalera-_largo_peldano*i+grosor_tabla,alto_peldano);
     }
     
-    // refuerzos
+    // refuerzos peldanos
     // bajo
     translate([0,largo_escalera/2,grosor_tabla])
         rotate([90,0,90]) tabla(alto_peldano-grosor_tabla,ancho_escalera);
@@ -156,11 +175,32 @@ module peldanos() {
     translate([0,_largo_peldano*(peldanos_escalera-1),grosor_tabla+alto_peldano])
         rotate([90,0,90]) tabla(alto_peldano-grosor_tabla,ancho_escalera);
     
+    // pie barandilla 0
     translate([ancho_escalera,0,alto_peldano+grosor_tabla]) rotate([0,0,90]) viga(50);
+    
+    // pie barandilla 1
     translate([ancho_escalera,largo_escalera-ancho_viga+grosor_tabla,alto_peldano*(peldanos_escalera)+grosor_tabla]) rotate([0,0,90]) viga(75);
     
+    // pie barandilla 2
+    translate([ancho_escalera, _largo_peldano*1, alto_peldano*(2)+grosor_tabla]) rotate([0,0,90]) liston(50);
+    translate([ancho_escalera, _largo_peldano*1.6, alto_peldano*(2)+grosor_tabla]) rotate([0,0,90]) liston(60);
+    
+    
+    // pie barandilla 3
+    translate([ancho_escalera, _largo_peldano*2.25, alto_peldano*(3)+grosor_tabla]) rotate([0,0,90]) liston(50);
+    // pie barandilla 3
+    translate([ancho_escalera, _largo_peldano*3-ancho_liston, alto_peldano*(3)+grosor_tabla]) rotate([0,0,90]) liston(70);
+    
+    // barandilla
     translate([ancho_escalera, 0, alto_peldano+50+grosor_tabla]) rotate([-35,0,0]) rotate([0,0,90]) viga(150);
     
+    // union barandilla <-> cama x3 
+    for (i=[1:3]) {
+        translate([0,
+                   largo_escalera-fondo_viga,
+                   alto_peldano*peldanos_escalera+i*(75/3)]) 
+            rotate([0, 90, 0]) viga(ancho_escalera-fondo_viga);
+    }
 }
 
 cama();
