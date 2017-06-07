@@ -74,6 +74,17 @@ module cama() {
                  viga(alto_vigas);
             }
         }
+
+         // refuerzos de las patas
+         color("red") {
+             translate([i * (largo_colchon - ancho_viga), 
+                        +fondo_viga,
+                         0]) viga(26);
+             translate([i * (largo_colchon - ancho_viga),
+                         fondo_viga + fondo_colchon -fondo_viga,
+                           0]) viga(26);
+            
+        }
     }
 
     // frontal litera
