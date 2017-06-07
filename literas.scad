@@ -88,7 +88,7 @@ module cama() {
     }
 
     // frontal litera
-    translate([ancho_viga, grosor_tabla, alto_litera + alto_colchon+20]) rotate([0, 0, -90 ]) tabla(largo_colchon-ancho_viga*2, 40);
+    translate([ancho_viga, 0, alto_litera + alto_colchon+40])  rotate([0,90,0]) viga (largo_colchon-ancho_viga*2);//tabla(largo_colchon-ancho_viga*2, 40);
 
     // refuerzos estructurales
     for(j=[0:1]) {
